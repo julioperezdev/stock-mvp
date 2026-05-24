@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { toUserMessage } from '../../core/services/api-error.util';
+import { AuthService } from '../../core/services/auth.service';
 import { ProductService } from '../../core/services/product.service';
 import { StockService } from '../../core/services/stock.service';
 import { StoreService } from '../../core/services/store.service';
@@ -42,8 +43,13 @@ export class StockComponent implements OnInit {
   constructor(
     private readonly productService: ProductService,
     private readonly storeService: StoreService,
-    private readonly stockService: StockService
+    private readonly stockService: StockService,
+    protected readonly authService: AuthService
   ) {}
+
+  canManageStock(): boolean {
+    return this.authService.hasAnyRole(['ADMIN']);
+  }
 
   ngOnInit(): void {
     this.loadInitialData();

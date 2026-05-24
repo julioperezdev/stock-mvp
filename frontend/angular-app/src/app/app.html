@@ -1,3 +1,4 @@
+@if (authService.currentUser()) {
 <div class="app-shell">
   <aside class="sidebar">
     <a class="brand" routerLink="/">
@@ -10,15 +11,30 @@
 
     <nav class="nav" aria-label="Principal">
       <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Dashboard</a>
-      <a routerLink="/sales/new" routerLinkActive="active">Venta</a>
+      @if (authService.hasAnyRole(['ADMIN', 'STORE_USER'])) {
+        <a routerLink="/sales/new" routerLinkActive="active">Venta</a>
+      }
       <a routerLink="/stock" routerLinkActive="active">Stock</a>
-      <a routerLink="/reports/low-stock" routerLinkActive="active">Criticos</a>
-      <a routerLink="/products" routerLinkActive="active">Productos</a>
-      <a routerLink="/stores" routerLinkActive="active">Locales</a>
+      @if (authService.hasAnyRole(['ADMIN', 'FACTORY_USER'])) {
+        <a routerLink="/reports/low-stock" routerLinkActive="active">Criticos</a>
+      }
+      @if (authService.hasAnyRole(['ADMIN'])) {
+        <a routerLink="/products" routerLinkActive="active">Productos</a>
+        <a routerLink="/stores" routerLinkActive="active">Locales</a>
+      }
     </nav>
+
+    <div class="user-box">
+      <strong>{{ authService.currentUser()?.fullName }}</strong>
+      <small>{{ authService.currentUser()?.role }}</small>
+      <button type="button" class="logout-button" (click)="logout()">Salir</button>
+    </div>
   </aside>
 
   <main class="main">
     <router-outlet />
   </main>
 </div>
+} @else {
+  <router-outlet />
+}

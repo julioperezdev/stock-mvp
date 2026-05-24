@@ -1,8 +1,9 @@
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
 import { toUserMessage } from '../../core/services/api-error.util';
+import { AuthService } from '../../core/services/auth.service';
 import { ProductService } from '../../core/services/product.service';
 import { SaleService } from '../../core/services/sale.service';
 import { StoreService } from '../../core/services/store.service';
@@ -41,7 +42,8 @@ export class SalesComponent implements OnInit {
   constructor(
     private readonly productService: ProductService,
     private readonly storeService: StoreService,
-    private readonly saleService: SaleService
+    private readonly saleService: SaleService,
+    private readonly authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -55,10 +57,11 @@ export class SalesComponent implements OnInit {
   loadInitialData(): void {
     this.loading = true;
     this.errorMessage = '';
+    const canReadSales = this.authService.hasAnyRole(['ADMIN', 'FACTORY_USER']);
     forkJoin({
       products: this.productService.list(),
       stores: this.storeService.list(),
-      sales: this.saleService.list()
+      sales: canReadSales ? this.saleService.list() : of([])
     }).subscribe({
       next: ({ products, stores, sales }) => {
         this.products = products;

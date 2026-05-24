@@ -41,6 +41,7 @@
     </form>
   </section>
 
+  @if (canManageStock()) {
   <form class="panel" [formGroup]="createForm" (ngSubmit)="createStock()">
     <h2 class="panel-title">Cargar stock</h2>
     <div class="grid grid-2">
@@ -71,6 +72,7 @@
       <button class="btn" type="submit">Guardar stock</button>
     </div>
   </form>
+  }
 
   <section class="panel">
     <h2 class="panel-title">Stock actual</h2>

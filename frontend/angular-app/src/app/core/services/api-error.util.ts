@@ -7,6 +7,12 @@ export function toUserMessage(error: unknown): string {
     if (apiError?.code === 'INSUFFICIENT_STOCK') {
       return 'No hay stock suficiente para completar la venta.';
     }
+    if (apiError?.code === 'INVALID_CREDENTIALS' || apiError?.code === 'UNAUTHORIZED') {
+      return 'Email o password incorrectos.';
+    }
+    if (apiError?.code === 'FORBIDDEN') {
+      return 'No tenes permisos para realizar esta accion.';
+    }
     if (apiError?.message) {
       return apiError.message;
     }

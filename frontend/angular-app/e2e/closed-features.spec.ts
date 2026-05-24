@@ -8,6 +8,10 @@ test('closed MVP flow works through the Angular UI', async ({ page }) => {
   const storeName = `Local UI ${suffix}`;
 
   await page.goto('http://localhost:4200/');
+  await expect(page.getByRole('heading', { name: 'Stock MVP' })).toBeVisible();
+  await page.locator('#email').fill('admin@stock.local');
+  await page.locator('#password').fill('admin123');
+  await page.getByRole('button', { name: 'Ingresar' }).click();
   await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 
   const productsLoad = page.waitForResponse((response) =>
