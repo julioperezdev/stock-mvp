@@ -1,0 +1,115 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1 class="page-title">Registrar venta</h1>
+      <p class="page-subtitle">Selecciona local, agrega productos y confirma la venta.</p>
+    </div>
+  </header>
+
+  @if (message) {
+    <div class="message">{{ message }}</div>
+  }
+  @if (errorMessage) {
+    <div class="message error">{{ errorMessage }}</div>
+  }
+
+  <section class="sale-layout">
+    <form class="panel grid" [formGroup]="saleForm" (ngSubmit)="confirmSale()">
+      <h2 class="panel-title">Datos de venta</h2>
+      <div class="field">
+        <label for="storeId">Local</label>
+        <select id="storeId" formControlName="storeId">
+          <option value="0">Seleccionar local</option>
+          <option *ngFor="let store of stores" [value]="store.id">{{ store.name }}</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="createdBy">Usuario</label>
+        <input id="createdBy" formControlName="createdBy" />
+      </div>
+      <div class="actions">
+        <button class="btn" type="submit" [disabled]="saleItems.length === 0">Confirmar venta</button>
+      </div>
+    </form>
+
+    <form class="panel grid" [formGroup]="itemForm" (ngSubmit)="addItem()">
+      <h2 class="panel-title">Agregar producto</h2>
+      <div class="field">
+        <label for="productId">Producto</label>
+        <select id="productId" formControlName="productId">
+          <option value="0">Seleccionar producto</option>
+          <option *ngFor="let product of products" [value]="product.id">{{ product.name }}</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="quantity">Cantidad</label>
+        <input id="quantity" type="number" min="1" formControlName="quantity" />
+      </div>
+      <div class="actions">
+        <button class="btn secondary" type="submit">Agregar</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="panel">
+    <h2 class="panel-title">Productos de la venta</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of saleItems; track item.productId) {
+            <tr>
+              <td>{{ productName(item.productId) }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>
+                <button class="btn danger" type="button" (click)="removeItem(item.productId)">Quitar</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="3">Todavia no agregaste productos.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2 class="panel-title">Ventas recientes</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Local</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Items</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (sale of recentSales; track sale.saleId) {
+            <tr>
+              <td>#{{ sale.saleId }}</td>
+              <td>{{ sale.storeName }}</td>
+              <td>{{ sale.createdAt }}</td>
+              <td><span class="status">{{ sale.status }}</span></td>
+              <td>{{ sale.items.length }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5">No hay ventas registradas.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>

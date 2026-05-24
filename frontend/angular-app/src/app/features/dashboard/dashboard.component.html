@@ -1,0 +1,78 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1 class="page-title">Dashboard</h1>
+      <p class="page-subtitle">Vista general del stock actual y productos criticos.</p>
+    </div>
+    <button class="btn secondary" type="button" (click)="load()">Actualizar</button>
+  </header>
+
+  @if (errorMessage) {
+    <div class="message error">{{ errorMessage }}</div>
+  }
+
+  @if (loading) {
+    <div class="panel">Cargando datos...</div>
+  } @else if (report) {
+    <div class="metric-grid">
+      <article class="metric">
+        <span>Productos</span>
+        <strong>{{ report.totalProducts }}</strong>
+      </article>
+      <article class="metric">
+        <span>Locales</span>
+        <strong>{{ report.totalStores }}</strong>
+      </article>
+      <article class="metric">
+        <span>Stocks</span>
+        <strong>{{ report.totalStockItems }}</strong>
+      </article>
+      <article class="metric critical">
+        <span>Criticos</span>
+        <strong>{{ report.criticalItems }}</strong>
+      </article>
+    </div>
+
+    <div class="quick-actions">
+      <a class="action-link" routerLink="/sales/new">Registrar venta</a>
+      <a class="action-link" routerLink="/stock">Consultar stock</a>
+      <a class="action-link" routerLink="/reports/low-stock">Ver criticos</a>
+    </div>
+
+    <section class="panel">
+      <h2 class="panel-title">Stock reciente</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Local</th>
+              <th>Producto</th>
+              <th>Actual</th>
+              <th>Minimo</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of report.items.slice(0, 8); track item.stockId) {
+              <tr>
+                <td>{{ item.storeName }}</td>
+                <td>{{ item.productName }}</td>
+                <td>{{ item.currentQuantity }}</td>
+                <td>{{ item.minimumQuantity }}</td>
+                <td>
+                  <span class="status" [class.warn]="item.critical">
+                    {{ item.critical ? 'Critico' : 'Normal' }}
+                  </span>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5">No hay stock cargado.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+</section>

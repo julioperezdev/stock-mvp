@@ -1,0 +1,24 @@
+<div class="app-shell">
+  <aside class="sidebar">
+    <a class="brand" routerLink="/">
+      <span class="brand-mark">S</span>
+      <span>
+        <strong>Stock MVP</strong>
+        <small>Locales y fabrica</small>
+      </span>
+    </a>
+
+    <nav class="nav" aria-label="Principal">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Dashboard</a>
+      <a routerLink="/sales/new" routerLinkActive="active">Venta</a>
+      <a routerLink="/stock" routerLinkActive="active">Stock</a>
+      <a routerLink="/reports/low-stock" routerLinkActive="active">Criticos</a>
+      <a routerLink="/products" routerLinkActive="active">Productos</a>
+      <a routerLink="/stores" routerLinkActive="active">Locales</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <router-outlet />
+  </main>
+</div>

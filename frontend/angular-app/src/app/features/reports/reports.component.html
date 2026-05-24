@@ -1,0 +1,45 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1 class="page-title">Stock critico</h1>
+      <p class="page-subtitle">Productos que requieren reposicion por local.</p>
+    </div>
+    <button class="btn secondary" type="button" (click)="load()">Actualizar</button>
+  </header>
+
+  @if (errorMessage) {
+    <div class="message error">{{ errorMessage }}</div>
+  }
+
+  <section class="panel">
+    <h2 class="panel-title">Faltantes</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Local</th>
+            <th>Producto</th>
+            <th>Actual</th>
+            <th>Minimo</th>
+            <th>Reponer</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of items; track item.stockId) {
+            <tr>
+              <td>{{ item.storeName }}</td>
+              <td>{{ item.productName }}</td>
+              <td>{{ item.currentQuantity }}</td>
+              <td>{{ item.minimumQuantity }}</td>
+              <td><span class="status warn">{{ item.suggestedReplenishment }}</span></td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5">No hay productos criticos.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>

@@ -1,0 +1,64 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1 class="page-title">Productos</h1>
+      <p class="page-subtitle">Alta y consulta de productos activos.</p>
+    </div>
+  </header>
+
+  @if (message) {
+    <div class="message">{{ message }}</div>
+  }
+  @if (errorMessage) {
+    <div class="message error">{{ errorMessage }}</div>
+  }
+
+  <form class="panel grid grid-3" [formGroup]="form" (ngSubmit)="create()">
+    <div class="field">
+      <label for="sku">SKU</label>
+      <input id="sku" formControlName="sku" placeholder="PROD-001" />
+    </div>
+    <div class="field">
+      <label for="name">Nombre</label>
+      <input id="name" formControlName="name" placeholder="Producto A" />
+    </div>
+    <div class="field">
+      <label for="description">Descripcion</label>
+      <input id="description" formControlName="description" placeholder="Opcional" />
+    </div>
+    <div class="actions">
+      <button class="btn" type="submit">Crear</button>
+      <button class="btn secondary" type="button" (click)="load()">Actualizar</button>
+    </div>
+  </form>
+
+  <section class="panel">
+    <h2 class="panel-title">Listado</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>SKU</th>
+            <th>Nombre</th>
+            <th>Descripcion</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (product of products; track product.id) {
+            <tr>
+              <td>{{ product.sku }}</td>
+              <td>{{ product.name }}</td>
+              <td>{{ product.description || '-' }}</td>
+              <td><span class="status">{{ product.active ? 'Activo' : 'Inactivo' }}</span></td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4">No hay productos cargados.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>

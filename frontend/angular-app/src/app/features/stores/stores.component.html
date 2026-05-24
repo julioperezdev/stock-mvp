@@ -1,0 +1,58 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1 class="page-title">Locales</h1>
+      <p class="page-subtitle">Alta y consulta de locales activos.</p>
+    </div>
+  </header>
+
+  @if (message) {
+    <div class="message">{{ message }}</div>
+  }
+  @if (errorMessage) {
+    <div class="message error">{{ errorMessage }}</div>
+  }
+
+  <form class="panel grid grid-2" [formGroup]="form" (ngSubmit)="create()">
+    <div class="field">
+      <label for="code">Codigo</label>
+      <input id="code" formControlName="code" placeholder="LOCAL-001" />
+    </div>
+    <div class="field">
+      <label for="name">Nombre</label>
+      <input id="name" formControlName="name" placeholder="Local Centro" />
+    </div>
+    <div class="actions">
+      <button class="btn" type="submit">Crear</button>
+      <button class="btn secondary" type="button" (click)="load()">Actualizar</button>
+    </div>
+  </form>
+
+  <section class="panel">
+    <h2 class="panel-title">Listado</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Codigo</th>
+            <th>Nombre</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (store of stores; track store.id) {
+            <tr>
+              <td>{{ store.code }}</td>
+              <td>{{ store.name }}</td>
+              <td><span class="status">{{ store.active ? 'Activo' : 'Inactivo' }}</span></td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="3">No hay locales cargados.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
