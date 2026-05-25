@@ -6,4 +6,6 @@ target/
 node_modules/
 dist/
 build/
+*.pem
+infra/.env
 stock-key.pem

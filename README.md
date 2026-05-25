@@ -44,6 +44,17 @@ docs/
   03_SPECIFICACION_LAMBDAS_AWS.md
 ```
 
+## Base de datos
+
+Las migraciones Flyway estan preparadas para una base nueva:
+
+```text
+V1__create_schema.sql
+V2__insert_default_users.sql
+```
+
+`V1` crea todas las tablas del MVP, incluyendo autenticacion/autorizacion. `V2` carga solo los usuarios iniciales para login.
+
 ## Requisitos locales
 
 - Docker Desktop o Docker daemon activo.
@@ -65,6 +76,175 @@ Desde la raiz del repo:
 
 ```bash
 docker compose -f infra/docker-compose.yml up -d postgres
+```
+
+Si estas probando localmente con un volumen viejo de PostgreSQL, recrear la base desde cero:
+
+```bash
+docker compose -f infra/docker-compose.yml down -v
+docker compose -f infra/docker-compose.yml up -d postgres
+```
+
+En un servidor nuevo no hace falta este paso porque la base arranca vacia.
+
+## Deploy Manual En Servidor
+
+Flujo esperado para un servidor nuevo:
+
+```bash
+git clone <repo-url>
+cd <repo>
+cp infra/.env.example infra/.env
+```
+
+Editar `infra/.env` antes de levantar produccion:
+
+```text
+POSTGRES_PASSWORD=...
+JWT_SECRET=...
+HTTP_PORT=80
+```
+
+Levantar todo:
+
+```bash
+./scripts/deploy.sh
+```
+
+Esto construye y levanta:
+
+- PostgreSQL.
+- Backend Spring Boot.
+- Frontend Angular servido por Nginx.
+- Proxy `/api` hacia el backend.
+
+Desde tu PC deberias poder abrir:
+
+```text
+http://IP_DEL_SERVIDOR
+```
+
+La API queda disponible via el mismo host:
+
+```text
+http://IP_DEL_SERVIDOR/api
+```
+
+Probar el deploy desde el servidor:
+
+```bash
+./scripts/smoke-test.sh http://localhost
+```
+
+Ver logs:
+
+```bash
+./scripts/logs.sh
+./scripts/logs.sh backend
+./scripts/logs.sh nginx
+./scripts/logs.sh postgres
+```
+
+Detener servicios:
+
+```bash
+./scripts/stop.sh
+```
+
+## Deploy Demo En Amazon Linux
+
+Para una demo simple en una instancia EC2 con Amazon Linux, se puede usar este `user data`.
+
+Este script instala Docker, Git y Docker Compose, clona el repo y crea `/home/ec2-user/run.sh`. El deploy no se ejecuta automaticamente en el arranque; despues de conectar por SSH se corre `./run.sh`.
+
+```bash
+#!/bin/bash
+set -e
+
+dnf update -y
+
+dnf install -y docker git docker-compose-plugin
+
+systemctl enable docker
+systemctl start docker
+
+usermod -aG docker ec2-user
+
+cd /home/ec2-user
+
+if [ ! -d "/home/ec2-user/stock-mvp" ]; then
+  git clone https://github.com/julioperezdev/stock-mvp.git
+fi
+
+cat << 'EOF' > /home/ec2-user/run.sh
+#!/bin/bash
+set -e
+
+PROJECT_DIR="/home/ec2-user/stock-mvp"
+
+cd "$PROJECT_DIR"
+
+echo "Updating repository..."
+git pull
+
+echo "Writing demo env..."
+cat << 'ENVEOF' > infra/.env
+POSTGRES_DB=stock_mvp
+POSTGRES_USER=stock_user
+POSTGRES_PASSWORD=stock_password
+POSTGRES_PORT_PUBLIC=5432
+
+SPRING_PROFILES_ACTIVE=prod
+JWT_SECRET=local-development-secret-change-me-please-32
+JWT_EXPIRATION_SECONDS=28800
+
+HTTP_PORT=80
+ENVEOF
+
+echo "Deploying..."
+./scripts/deploy.sh
+
+echo "Done. Running containers:"
+docker ps
+EOF
+
+chmod +x /home/ec2-user/run.sh
+
+chown -R ec2-user:ec2-user /home/ec2-user/stock-mvp
+chown ec2-user:ec2-user /home/ec2-user/run.sh
+
+docker --version
+docker compose version
+git --version
+systemctl status docker --no-pager
+```
+
+Luego entrar por SSH:
+
+```bash
+ssh -i <key.pem> ec2-user@<IP_PUBLICA>
+./run.sh
+```
+
+Abrir desde tu PC:
+
+```text
+http://IP_PUBLICA
+```
+
+Usuarios demo:
+
+```text
+admin@stock.local / admin123
+local@stock.local / local123
+fabrica@stock.local / fabrica123
+```
+
+Para una demo, el security group debe permitir al menos:
+
+```text
+22  SSH   desde tu IP
+80  HTTP  desde tu IP o 0.0.0.0/0
 ```
 
 PostgreSQL queda disponible en:
