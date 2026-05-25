@@ -23,6 +23,13 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
+    private static final List<String> ALLOWED_ORIGINS = List.of(
+            "http://localhost:4200",
+            "http://127.0.0.1:4200",
+            "https://tesis.dev",
+            "https://www.tesis.dev"
+    );
+
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
@@ -70,7 +77,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://127.0.0.1:4200"));
+        configuration.setAllowedOrigins(ALLOWED_ORIGINS);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setExposedHeaders(List.of("Authorization"));

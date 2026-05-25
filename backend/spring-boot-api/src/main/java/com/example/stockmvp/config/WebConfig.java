@@ -12,7 +12,9 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/api/**")
                 .allowedOrigins(
                         "http://localhost:4200",
-                        "http://127.0.0.1:4200"
+                        "http://127.0.0.1:4200",
+                        "https://tesis.dev",
+                        "https://www.tesis.dev"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*");
